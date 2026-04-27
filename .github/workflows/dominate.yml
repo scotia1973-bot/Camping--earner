@@ -16,9 +16,9 @@ jobs:
       - name: Generate
         run: python dominate.py
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          AMAZON_TAG: ${{ secrets.AMAZON_TAG }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.AIzaSyC24AKJAYI9X92pRtMHDgMwZPp76U76n8U }}
+          AMAZON_TAG: ${{ secrets.gadgethumans-21}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
       - name: Commit
         run: |
           git config user.name "AI"
