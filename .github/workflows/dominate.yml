@@ -16,7 +16,7 @@ jobs:
       - name: Generate
         run: python dominate.py
         env:
-          GEMINI_API_KEY: ${{ secrets.AIzaSyC24AKJAYI9X92pRtMHDgMwZPp76U76n8U }}
+          openrouter_api_key: ${{ secrets.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 }}
           AMAZON_TAG: ${{ secrets.gadgethumans-21}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN  }}
       - name: Commit
