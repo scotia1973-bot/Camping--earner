@@ -1,0 +1,23 @@
+name: Dominate
+on:
+  schedule:
+    - cron: '0 */8 * * *'
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install requests
+      - run: python dominate.py
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AMAZON_TAG: ${{ secrets.AMAZON_TAG }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          git config user.name "AI"
+          git add .
+          git diff --quiet || git commit -m "Auto"
+          git push
