@@ -1,38 +1,19 @@
 import os, datetime, requests, time
-
 GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
 AMAZON_TAG = os.environ.get("AMAZON_TAG")
-
-if not GEMINI_KEY:
-    raise ValueError("Missing GEMINI_API_KEY secret")
-
-print(f"API Key found. Amazon tag: {AMAZON_TAG}")
-
-NICHES = ["best camping stove under 50", "lightweight tent for backpacking", "sleeping bag 30 degree", "camping chair for bad back", "water filter for hiking", "headlamp with red light", "power bank for camping", "camping cookware set nonstick"]
-
+if not GEMINI_KEY: raise ValueError("Missing GEMINI_API_KEY")
+print(f"Starting with tag: {AMAZON_TAG}")
+NICHES = ["best camping stove", "lightweight tent", "sleeping bag", "camping chair"]
 topic = NICHES[datetime.datetime.now().timetuple().tm_yday % len(NICHES)]
-print(f"Generating: {topic}")
-
 url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_KEY}"
-prompt = f"Write a 1000-word review of '{topic}' for UK audience. Include Amazon UK link: https://www.amazon.co.uk/s?k={topic.replace(' ', '+')}&tag={AMAZON_TAG}. Return HTML."
-
-response = requests.post(url, headers={"Content-Type": "application/json"}, json={
-    "contents": [{"parts": [{"text": prompt}]}],
-    "generationConfig": {"temperature": 0.7, "maxOutputTokens": 1500}
-})
-
-print(f"API status: {response.status_code}")
-
-if response.status_code == 200:
-    result = response.json()
-    html = result["candidates"][0]["content"]["parts"][0]["text"]
-    today = datetime.datetime.now().strftime("%Y-%m-%d")
-    os.makedirs(today, exist_ok=True)
-    with open(f"{today}/index.html", "w") as f:
-        f.write(f"<html><body><h1>{topic}</h1>{html}<footer>Amazon Associate</footer></body></html>")
-    with open("index.html", "w") as f:
-        f.write(f"<html><body><h1>Camping UK</h1><p>Latest: {topic}</p><a href='{today}/index.html'>Read more</a></body></html>")
+resp = requests.post(url, headers={"Content-Type":"application/json"}, json={"contents":[{"parts":[{"text":f"Write 500-word review of {topic} for UK. Include Amazon link with tag {AMAZON_TAG}. Return HTML."}]}],"generationConfig":{"maxOutputTokens":1000}})
+print(f"API status: {resp.status_code}")
+if resp.status_code == 200:
+    html = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+    os.makedirs("posts", exist_ok=True)
+    with open("posts/index.html", "w") as f: f.write(f"<html><body>{html}<footer>Amazon</footer></body></html>")
+    with open("index.html", "w") as f: f.write("<h1>Camping UK</h1><a href='posts/index.html'>Latest</a>")
     print("Success!")
 else:
-    print(f"Error: {response.text}")
-    raise Exception("API call failed")
+    print(resp.text)
+    exit(1)
